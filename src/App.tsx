@@ -1,25 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useMemo, useReducer } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import Header from "./components/Header/Header";
+import Layout from "./components/Layout/Layout";
+import GlobalReducerContext from "./context/GlobalReducerContext";
+import PostsPage from "./pages/PostsPage/PostsPage";
+import TodosPage from "./pages/TodosPage/TodosPage";
+import UsersPage from "./pages/UsersPage/UsersPage";
+import { globalReducer, initialState } from "./reducers/globalReducer";
 
 function App() {
+  const [state, dispatch] = useReducer(globalReducer, initialState);
+  const reducerValue = useMemo(() => ({ state, dispatch }), [state, dispatch]);
+
+  const header = <Header />;
+
+  const content = (
+    <Routes>
+      <Route index path="*" element={<Navigate to="users" />} />
+      <Route index path="/users" element={<UsersPage />} />
+      <Route path="/posts" element={<PostsPage />} />
+      <Route path="/todos" element={<TodosPage />} />
+    </Routes>
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GlobalReducerContext.Provider value={reducerValue}>
+      <Layout header={header} content={content} />
+    </GlobalReducerContext.Provider>
   );
 }
 
